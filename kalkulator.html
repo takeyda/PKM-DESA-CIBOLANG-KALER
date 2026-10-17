@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Kalkulator Pinjol – SIDANTI</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .tab-row { display:flex; gap:0; border:1px solid var(--border); border-radius:9px; overflow:hidden; margin-bottom:18px; }
+  .tab-opt { flex:1; padding:10px; text-align:center; font-size:0.82rem; font-weight:700; cursor:pointer; background:var(--surface); color:var(--muted); border:none; transition:all 0.15s; }
+  .tab-opt.active { background:var(--blue); color:#fff; }
+  .comparison-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+  .comp-card { border-radius:9px; padding:14px; text-align:center; }
+  .comp-card .label { font-size:0.72rem; font-weight:700; margin-bottom:6px; }
+  .comp-card .amount { font-size:1.3rem; font-weight:800; line-height:1; }
+  .comp-card .sub { font-size:0.7rem; margin-top:4px; }
+  .ilegal-card { background:#FEF2F2; border:1px solid #FECACA; }
+  .ilegal-card .label { color:#991B1B; }
+  .ilegal-card .amount { color:#DC2626; }
+  .legal-card { background:#F0FDF4; border:1px solid #86EFAC; }
+  .legal-card .label { color:#166534; }
+  .legal-card .amount { color:#15803D; }
+  .month-table { width:100%; border-collapse:collapse; font-size:0.8rem; margin-top:12px; }
+  .month-table th { background:var(--blue); color:#fff; padding:8px; text-align:left; font-weight:700; }
+  .month-table td { padding:8px; border-bottom:1px solid var(--border); }
+  .month-table tr:last-child td { border-bottom:none; font-weight:700; background:var(--blue-light); }
+  .month-table .danger { color:var(--red); font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="topbar-back">←</a>
+  <div>
+    <div class="topbar-title">🧮 Kalkulator Bahaya Pinjol</div>
+    <div class="topbar-sub">Lihat angka nyata sebelum meminjam</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="alert alert-amber" style="margin-top:4px;">
+    <span>💡</span>
+    <span>Banyak pinjol ilegal menawarkan bunga <strong>"kecil"</strong> per hari, tapi ketika dihitung total, bisa berlipat ganda.</span>
+  </div>
+
+  <!-- INPUT -->
+  <div class="card">
+    <h2 style="margin-bottom:14px;">Masukkan Detail Pinjaman</h2>
+
+    <div class="tab-row">
+      <button class="tab-opt active" id="tabIlegal" onclick="setType('ilegal')">⚠️ Pinjol Ilegal</button>
+      <button class="tab-opt" id="tabLegal" onclick="setType('legal')">✅ Pinjol Legal OJK</button>
+    </div>
+
+    <div id="inputIlegal">
+      <div class="input-wrap">
+        <label>Jumlah pinjaman (Rp)</label>
+        <input type="number" id="pokokIlegal" class="input-field" placeholder="Contoh: 1000000" min="0">
+      </div>
+      <div class="input-wrap">
+        <label>Bunga per hari (%)</label>
+        <input type="number" id="bungaIlegal" class="input-field" placeholder="Contoh: 1 (berarti 1% per hari)" min="0" step="0.1" value="1">
+      </div>
+      <div class="input-wrap">
+        <label>Tenor (hari)</label>
+        <input type="number" id="tenorIlegal" class="input-field" placeholder="Contoh: 30" min="1" value="30">
+      </div>
+    </div>
+
+    <div id="inputLegal" style="display:none;">
+      <div class="input-wrap">
+        <label>Jumlah pinjaman (Rp)</label>
+        <input type="number" id="pokokLegal" class="input-field" placeholder="Contoh: 1000000" min="0">
+      </div>
+      <div class="input-wrap">
+        <label>Bunga per bulan (%)</label>
+        <input type="number" id="bungaLegal" class="input-field" placeholder="Maks 0,3%/hari = ~9%/bln" value="3" min="0" step="0.1">
+      </div>
+      <div class="input-wrap">
+        <label>Tenor (bulan)</label>
+        <input type="number" id="tenorLegal" class="input-field" placeholder="Contoh: 6" min="1" value="6">
+      </div>
+    </div>
+
+    <button class="btn btn-blue btn-full btn-lg" onclick="hitung()">🧮 Hitung Sekarang</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="kalkulatorResult" style="display:none;">
+
+    <div class="card" id="summaryCard">
+      <h3 style="margin-bottom:14px;" id="resultHeading"></h3>
+      <div class="comparison-row" id="comparisonRow"></div>
+      <div class="divider"></div>
+      <div id="bunga-warning" class="alert alert-red" style="display:none;">
+        <span>🚨</span>
+        <span id="bunga-warning-text"></span>
+      </div>
+    </div>
+
+    <!-- GRAFIK BATANG BULANAN -->
+    <div class="card">
+      <h3 style="margin-bottom:14px;">📊 Perkembangan Hutang</h3>
+      <div id="grafik"></div>
+    </div>
+
+    <!-- TABEL CICILAN -->
+    <div class="card">
+      <h3 style="margin-bottom:12px;">📋 Rincian per Periode</h3>
+      <div style="overflow-x:auto;">
+        <table class="month-table" id="tabelCicilan"></table>
+      </div>
+    </div>
+
+    <!-- PERBANDINGAN -->
+    <div class="card card-info">
+      <h3 style="margin-bottom:10px;">💡 Uang ini setara dengan...</h3>
+      <div id="analogiUang"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Beranda</a>
+  <a href="cek-pinjol.html" class="nav-item"><span class="nav-icon">🔍</span>Cek Pinjol</a>
+  <a href="kalkulator.html" class="nav-item active"><span class="nav-icon">🧮</span>Kalkulator</a>
+  <a href="self-assessment.html" class="nav-item"><span class="nav-icon">📋</span>Cek Risiko</a>
+  <a href="edukasi.html" class="nav-item"><span class="nav-icon">🎯</span>Kuis</a>
+</nav>
+
+<script>
+const fmt = n => new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', minimumFractionDigits:0 }).format(n);
+let mode = 'ilegal';
+
+function setType(t) {
+  mode = t;
+  document.getElementById('inputIlegal').style.display = t === 'ilegal' ? 'block' : 'none';
+  document.getElementById('inputLegal').style.display  = t === 'legal'  ? 'block' : 'none';
+  document.getElementById('tabIlegal').classList.toggle('active', t === 'ilegal');
+  document.getElementById('tabLegal').classList.toggle('active',  t === 'legal');
+  document.getElementById('kalkulatorResult').style.display = 'none';
+}
+
+function hitung() {
+  if (mode === 'ilegal') hitungIlegal();
+  else hitungLegal();
+}
+
+function hitungIlegal() {
+  const pokok = parseFloat(document.getElementById('pokokIlegal').value) || 0;
+  const bunga = parseFloat(document.getElementById('bungaIlegal').value) || 0;
+  const tenor = parseInt(document.getElementById('tenorIlegal').value) || 0;
+  if (!pokok || !tenor) { alert('Isi semua kolom.'); return; }
+
+  const bungaHarian = bunga / 100;
+  const totalBunga = pokok * bungaHarian * tenor;
+  const totalBayar = pokok + totalBunga;
+  const bungaPerBulan = bunga * 30;
+  const bungaOJKMax = 0.3 * 30; // 9% per bulan
+
+  // Summary
+  document.getElementById('resultHeading').textContent = '⚠️ Rincian Pinjol Ilegal';
+  document.getElementById('comparisonRow').innerHTML = `
+    <div class="comp-card ilegal-card">
+      <div class="label">TOTAL HARUS DIBAYAR</div>
+      <div class="amount">${fmt(totalBayar)}</div>
+      <div class="sub" style="color:#991B1B;">dari pinjam ${fmt(pokok)}</div>
+    </div>
+    <div class="comp-card" style="background:#FFFBEB; border:1px solid #FDE68A;">
+      <div class="label" style="color:#92400E;">TOTAL BUNGA</div>
+      <div class="amount" style="color:#B45309;">${fmt(totalBunga)}</div>
+      <div class="sub" style="color:#92400E;">${(totalBunga/pokok*100).toFixed(0)}% dari pokok</div>
+    </div>
+  `;
+
+  const warn = document.getElementById('bunga-warning');
+  if (bungaPerBulan > bungaOJKMax) {
+    warn.style.display = 'flex';
+    document.getElementById('bunga-warning-text').innerHTML =
+      `Bunga ${bunga}%/hari = <strong>${bungaPerBulan.toFixed(0)}%/bulan</strong>. Batas OJK hanya <strong>9%/bulan</strong>. Ini <strong>${(bungaPerBulan/bungaOJKMax).toFixed(1)}x lipat</strong> batas legal!`;
+  } else { warn.style.display = 'none'; }
+
+  // Grafik per 5 hari
+  let grafikHTML = '';
+  const steps = Math.min(tenor, 10);
+  const interval = Math.ceil(tenor / steps);
+  const maxVal = totalBayar;
+  for (let h = interval; h <= tenor; h += interval) {
+    const sisa = pokok + pokok * bungaHarian * h;
+    const pct = Math.round((sisa / maxVal) * 100);
+    grafikHTML += `<div class="chart-row">
+      <div class="chart-label"><span>Hari ${h}</span><span>${fmt(sisa)}</span></div>
+      <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:0%;background:#DC2626;" data-w="${pct}"></div></div>
+    </div>`;
+  }
+  document.getElementById('grafik').innerHTML = grafikHTML;
+
+  // Tabel per 10 hari
+  let tabelHTML = '<tr><th>Periode</th><th>Hutang Pokok</th><th>Bunga</th><th>Total</th></tr>';
+  const intervals = [];
+  for (let h = Math.min(10, tenor); h <= tenor; h += Math.min(10, tenor)) {
+    intervals.push(h);
+    if (h === tenor) break;
+  }
+  if (!intervals.includes(tenor)) intervals.push(tenor);
+  intervals.forEach(h => {
+    const b = pokok * bungaHarian * h;
+    const t = pokok + b;
+    tabelHTML += `<tr><td>Hari ${h}</td><td>${fmt(pokok)}</td><td class="danger">${fmt(b)}</td><td>${fmt(t)}</td></tr>`;
+  });
+  document.getElementById('tabelCicilan').innerHTML = tabelHTML;
+
+  // Analogi
+  document.getElementById('analogiUang').innerHTML = `
+    <div class="list-row"><div class="ico">🌾</div><div class="body"><p>Setara <strong>${Math.round(totalBunga/12000).toLocaleString('id-ID')} kg beras</strong> yang bisa dibeli keluarga Anda.</p></div></div>
+    <div class="list-row"><div class="ico">📚</div><div class="body"><p>Setara biaya sekolah anak selama <strong>${Math.round(totalBunga/300000)} bulan</strong>.</p></div></div>
+    <div class="list-row"><div class="ico">💊</div><div class="body"><p>Setara <strong>${Math.round(totalBunga/50000).toLocaleString('id-ID')} kali</strong> berobat ke Puskesmas.</p></div></div>
+  `;
+
+  tampilkan();
+}
+
+function hitungLegal() {
+  const pokok = parseFloat(document.getElementById('pokokLegal').value) || 0;
+  const bunga = parseFloat(document.getElementById('bungaLegal').value) || 0;
+  const tenor = parseInt(document.getElementById('tenorLegal').value) || 0;
+  if (!pokok || !tenor) { alert('Isi semua kolom.'); return; }
+
+  const bungaBulan = bunga / 100;
+  const angsuran = (pokok * bungaBulan * Math.pow(1+bungaBulan,tenor)) / (Math.pow(1+bungaBulan,tenor)-1);
+  const totalBayar = angsuran * tenor;
+  const totalBunga = totalBayar - pokok;
+
+  document.getElementById('resultHeading').textContent = '✅ Rincian Pinjol Legal OJK';
+  document.getElementById('comparisonRow').innerHTML = `
+    <div class="comp-card legal-card">
+      <div class="label">TOTAL HARUS DIBAYAR</div>
+      <div class="amount">${fmt(totalBayar)}</div>
+      <div class="sub" style="color:#166534;">dari pinjam ${fmt(pokok)}</div>
+    </div>
+    <div class="comp-card" style="background:#F0FDF4; border:1px solid #86EFAC;">
+      <div class="label" style="color:#166534;">ANGSURAN/BULAN</div>
+      <div class="amount" style="color:#15803D;">${fmt(angsuran)}</div>
+      <div class="sub" style="color:#166534;">selama ${tenor} bulan</div>
+    </div>
+  `;
+  document.getElementById('bunga-warning').style.display = 'none';
+
+  let grafikHTML = '';
+  for (let m = 1; m <= tenor; m++) {
+    const sisaPokok = pokok - (pokok/tenor)*m;
+    const pct = Math.round(((pokok - sisaPokok)/pokok)*100);
+    grafikHTML += `<div class="chart-row">
+      <div class="chart-label"><span>Bulan ${m}</span><span>${fmt(Math.max(0,sisaPokok))} sisa</span></div>
+      <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:0%;background:#15803D;" data-w="${pct}"></div></div>
+    </div>`;
+  }
+  document.getElementById('grafik').innerHTML = grafikHTML;
+
+  let tabelHTML = '<tr><th>Bulan</th><th>Angsuran</th><th>Bunga</th><th>Sisa Pokok</th></tr>';
+  for (let m = 1; m <= tenor; m++) {
+    const sisaPokok = Math.max(0, pokok - (pokok/tenor)*m);
+    const b = angsuran - pokok/tenor;
+    tabelHTML += `<tr><td>Bulan ${m}</td><td>${fmt(angsuran)}</td><td>${fmt(b)}</td><td>${fmt(sisaPokok)}</td></tr>`;
+  }
+  document.getElementById('tabelCicilan').innerHTML = tabelHTML;
+
+  document.getElementById('analogiUang').innerHTML = `
+    <div class="list-row"><div class="ico">✅</div><div class="body"><p>Bunga total <strong>${fmt(totalBunga)}</strong> — lebih terkendali dan transparan dibanding pinjol ilegal.</p></div></div>
+    <div class="list-row"><div class="ico">💡</div><div class="body"><p>Tetap pastikan angsuran <strong>${fmt(angsuran)}/bulan</strong> tidak melebihi 30% penghasilan bulanan Anda.</p></div></div>
+  `;
+
+  tampilkan();
+}
+
+function tampilkan() {
+  document.getElementById('kalkulatorResult').style.display = 'block';
+  document.getElementById('kalkulatorResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => {
+    document.querySelectorAll('.chart-bar-fill[data-w]').forEach(el => {
+      el.style.width = el.getAttribute('data-w') + '%';
+    });
+  }, 200);
+}
+</script>
+</body>
+</html>

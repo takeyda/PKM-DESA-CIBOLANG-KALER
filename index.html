@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SIDANTI – Sistem Desa Anti Tipu Digital</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .alert-bansos {
+    background: #FFF7ED;
+    border: 1.5px solid #FED7AA;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .alert-bansos .ico { font-size: 1.6rem; flex-shrink: 0; }
+  .alert-bansos h4 { font-size: 0.85rem; font-weight: 700; color: #92400E; margin-bottom: 4px; }
+  .alert-bansos p { font-size: 0.78rem; color: #78350F; }
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 10px; text-align: center; }
+  .stat-card .num { font-size: 1.4rem; font-weight: 800; color: var(--red); line-height: 1; }
+  .stat-card .lbl { font-size: 0.65rem; color: var(--muted); margin-top: 4px; line-height: 1.3; }
+  .footer-note { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 16px 0 4px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar" style="padding: 16px 20px;">
+  <div>
+    <div class="topbar-title" style="font-size:1.05rem;">🛡️ SIDANTI</div>
+    <div class="topbar-sub">Sistem Desa Anti Tipu Digital</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div style="max-width:520px; margin:0 auto;">
+    <p style="font-size:0.75rem; opacity:0.7; margin-bottom:6px;">PKM Universitas Nusaputra · 2025</p>
+    <h1>Lindungi Diri dari<br>Pinjol, Judol & Hoaks</h1>
+    <p style="margin-top:8px;">Cek, kenali, dan hindari ancaman digital yang merugikan masyarakat desa.</p>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ALERT BANSOS -->
+  <div class="alert-bansos">
+    <div class="ico">⚠️</div>
+    <div>
+      <h4>Penerima Bantuan Sosial, Waspada!</h4>
+      <p>Rekening yang terindikasi transaksi pinjol/judol dapat diblacklist oleh PPATK dan kehilangan hak penerimaan bantuan sosial (PKH, BLT, dll).</p>
+    </div>
+  </div>
+
+  <!-- STATISTIK -->
+  <div class="section-title">Fakta di Indonesia</div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="num">4.8Jt</div>
+      <div class="lbl">Korban pinjol ilegal per tahun</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">8.8Jt</div>
+      <div class="lbl">Pemain judol aktif (PPATK 2024)</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">327T</div>
+      <div class="lbl">Perputaran uang judol 2024</div>
+    </div>
+  </div>
+
+  <!-- MENU UTAMA -->
+  <div class="section-title">Pilih Layanan</div>
+  <div class="menu-grid">
+    <a href="cek-pinjol.html" class="menu-card">
+      <div class="menu-icon">🔍</div>
+      <h3>Cek Pinjol Legal / Ilegal</h3>
+      <p>Periksa status izin OJK</p>
+    </a>
+    <a href="cek-judol.html" class="menu-card">
+      <div class="menu-icon">🎰</div>
+      <h3>Deteksi Judol</h3>
+      <p>Cek situs & modus judol</p>
+    </a>
+    <a href="kalkulator.html" class="menu-card">
+      <div class="menu-icon">🧮</div>
+      <h3>Kalkulator Bahaya Pinjol</h3>
+      <p>Hitung total hutang nyata</p>
+    </a>
+    <a href="self-assessment.html" class="menu-card">
+      <div class="menu-icon">📋</div>
+      <h3>Cek Risiko Digital Saya</h3>
+      <p>Self-assessment 10 pertanyaan</p>
+    </a>
+    <a href="edukasi.html" class="menu-card">
+      <div class="menu-icon">🎯</div>
+      <h3>Kuis & Edukasi</h3>
+      <p>Uji pengetahuan & tips</p>
+    </a>
+    <a href="aduan.html" class="menu-card">
+      <div class="menu-icon">📞</div>
+      <h3>Cara Lapor & Aduan</h3>
+      <p>Nomor & prosedur resmi</p>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- INFO KELUAR JERAT -->
+  <div class="section-title">Sudah Terlanjur Terjerat?</div>
+  <div class="card card-info">
+    <div class="list-row">
+      <div class="ico">1️⃣</div>
+      <div class="body"><h4>Hentikan pembayaran ke pinjol ilegal</h4><p>Pinjol ilegal tidak punya kekuatan hukum menagih. Jangan bayar biaya denda tambahan.</p></div>
+    </div>
+    <div class="list-row">
+      <div class="ico">2️⃣</div>
+      <div class="body"><h4>Laporkan ke OJK & Kepolisian</h4><p>Hubungi 157 (OJK) atau buat laporan di patrolisiber.id</p></div>
+    </div>
+    <div class="list-row">
+      <div class="ico">3️⃣</div>
+      <div class="body"><h4>Blokir nomor penagih</h4><p>Simpan tangkapan layar ancaman sebagai bukti laporan.</p></div>
+    </div>
+    <div class="list-row">
+      <div class="ico">4️⃣</div>
+      <div class="body"><h4>Hubungi pihak desa/kelurahan</h4><p>Minta bantuan pendampingan jika rekening diblacklist.</p></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Dikembangkan oleh Tim PKM<br>
+    <strong>Tasya Yustira Agustian & Hilman Yunus</strong><br>
+    Universitas Nusaputra · Teknik Komputer dan Desain · 2025
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item active">
+    <span class="nav-icon">🏠</span>Beranda
+  </a>
+  <a href="cek-pinjol.html" class="nav-item">
+    <span class="nav-icon">🔍</span>Cek Pinjol
+  </a>
+  <a href="kalkulator.html" class="nav-item">
+    <span class="nav-icon">🧮</span>Kalkulator
+  </a>
+  <a href="self-assessment.html" class="nav-item">
+    <span class="nav-icon">📋</span>Cek Risiko
+  </a>
+  <a href="edukasi.html" class="nav-item">
+    <span class="nav-icon">🎯</span>Kuis
+  </a>
+</nav>
+
+</body>
+</html>

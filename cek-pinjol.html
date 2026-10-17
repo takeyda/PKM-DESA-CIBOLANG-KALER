@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Cek Pinjol – SIDANTI</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="topbar-back">←</a>
+  <div>
+    <div class="topbar-title">🔍 Cek Pinjol Legal / Ilegal</div>
+    <div class="topbar-sub">Berdasarkan data OJK terdaftar</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="alert alert-blue" style="margin-top:4px;">
+    <span>ℹ️</span>
+    <span>Hanya fintech <strong>terdaftar dan berizin OJK</strong> yang legal beroperasi di Indonesia. Selain itu, ilegal.</span>
+  </div>
+
+  <!-- FORM CEK -->
+  <div class="card">
+    <h2 style="margin-bottom:14px;">Cari Nama Aplikasi Pinjol</h2>
+    <div class="input-wrap">
+      <label>Nama aplikasi atau perusahaan</label>
+      <input type="text" id="pinjolInput" class="input-field" placeholder="Contoh: Kredivo, KoinWorks, Dana Cepat...">
+    </div>
+    <button class="btn btn-blue btn-full" onclick="cekPinjol()">🔍 Periksa Sekarang</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="pinjolResult" class="result-box"></div>
+
+  <!-- CIRI PINJOL ILEGAL -->
+  <div class="section-title" style="margin-top:8px;">Ciri-ciri Pinjol Ilegal</div>
+  <div class="card" id="ciriList"></div>
+
+  <!-- TIPS -->
+  <div class="card card-warning">
+    <h3 style="margin-bottom:10px;">⚠️ Ingat Sebelum Pinjam</h3>
+    <div class="list-row">
+      <div class="ico">📌</div>
+      <div class="body"><p>Bunga legal maksimal <strong>0,3% per hari</strong> sesuai aturan OJK. Lebih dari itu, ilegal.</p></div>
+    </div>
+    <div class="list-row">
+      <div class="ico">📌</div>
+      <div class="body"><p>Pinjol legal <strong>tidak boleh</strong> mengakses kontak, galeri, atau SMS di HP Anda.</p></div>
+    </div>
+    <div class="list-row">
+      <div class="ico">📌</div>
+      <div class="body"><p>Selalu cek di <strong>ojk.go.id</strong> atau hubungi <strong>157</strong> sebelum meminjam.</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Beranda</a>
+  <a href="cek-pinjol.html" class="nav-item active"><span class="nav-icon">🔍</span>Cek Pinjol</a>
+  <a href="kalkulator.html" class="nav-item"><span class="nav-icon">🧮</span>Kalkulator</a>
+  <a href="self-assessment.html" class="nav-item"><span class="nav-icon">📋</span>Cek Risiko</a>
+  <a href="edukasi.html" class="nav-item"><span class="nav-icon">🎯</span>Kuis</a>
+</nav>
+
+<script>
+// Render ciri list
+const ciriEl = document.getElementById('ciriList');
+ciriEl.innerHTML = DATA_PINJOL_ILEGAL_CIRI.map(c =>
+  `<div class="list-row"><div class="ico">${c.icon}</div><div class="body"><p>${c.ciri}</p></div></div>`
+).join('');
+
+function cekPinjol() {
+  const input = document.getElementById('pinjolInput').value.trim();
+  if (!input) { alert('Masukkan nama aplikasi terlebih dahulu.'); return; }
+
+  const resultEl = document.getElementById('pinjolResult');
+  const found = DATA_PINJOL_LEGAL.find(n => n.toLowerCase().includes(input.toLowerCase()) || input.toLowerCase().includes(n.toLowerCase()));
+
+  resultEl.className = 'result-box show';
+
+  if (found) {
+    resultEl.style.background = '#F0FDF4';
+    resultEl.style.border = '1.5px solid #86EFAC';
+    resultEl.innerHTML = `
+      <div class="result-icon">✅</div>
+      <div class="result-title" style="color:#15803D;">Terdaftar & Berizin OJK</div>
+      <div class="result-desc" style="margin-top:8px;">
+        <strong>"${found}"</strong> ditemukan dalam daftar fintech berizin OJK.<br><br>
+        Meski legal, tetap baca syarat & ketentuan dengan teliti sebelum meminjam.
+      </div>
+      <div style="margin-top:14px; padding:12px; background:#DCFCE7; border-radius:8px; font-size:0.82rem; color:#166534;">
+        📌 Tetap perhatikan bunga, tenor, dan total yang harus dibayar sebelum setuju.
+      </div>
+    `;
+  } else {
+    resultEl.style.background = '#FEF2F2';
+    resultEl.style.border = '1.5px solid #FECACA';
+    resultEl.innerHTML = `
+      <div class="result-icon">⚠️</div>
+      <div class="result-title" style="color:#DC2626;">"${input}" Tidak Ditemukan</div>
+      <div class="result-desc" style="margin-top:8px;">
+        Nama ini <strong>tidak ada dalam daftar fintech berizin OJK</strong> yang kami miliki.<br><br>
+        Kemungkinan: belum terdaftar, nama berbeda, atau <strong>pinjol ilegal</strong>.
+      </div>
+      <div style="margin-top:14px; padding:12px; background:#FEE2E2; border-radius:8px; font-size:0.82rem; color:#991B1B;">
+        🚨 <strong>Jangan pinjam</strong> sebelum verifikasi ulang di <strong>ojk.go.id</strong> atau telepon <strong>157</strong>.
+      </div>
+      <a href="https://ojk.go.id" target="_blank" class="btn btn-red btn-full" style="margin-top:12px; font-size:0.85rem;">
+        Verifikasi di OJK.go.id →
+      </a>
+    `;
+  }
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+document.getElementById('pinjolInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') cekPinjol();
+});
+</script>
+</body>
+</html>

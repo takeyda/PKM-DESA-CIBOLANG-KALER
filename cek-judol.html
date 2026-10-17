@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Deteksi Judol – SIDANTI</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="topbar-back">←</a>
+  <div>
+    <div class="topbar-title">🎰 Deteksi Judi Online</div>
+    <div class="topbar-sub">Kenali sebelum terjerat</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="alert alert-red" style="margin-top:4px;">
+    <span>🚨</span>
+    <span>Judi online <strong>ilegal di Indonesia</strong>. Pelaku dapat dipidana hingga <strong>10 tahun penjara</strong> (KUHP Pasal 303).</span>
+  </div>
+
+  <!-- CEK NAMA -->
+  <div class="card">
+    <h2 style="margin-bottom:14px;">Cek Nama Aplikasi / Situs</h2>
+    <div class="input-wrap">
+      <label>Nama aplikasi, situs, atau kata kunci</label>
+      <input type="text" id="judolInput" class="input-field" placeholder="Contoh: slot gacor, poker online, togel...">
+    </div>
+    <button class="btn btn-red btn-full" onclick="cekJudol()">🔍 Periksa Sekarang</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="judolResult" class="result-box"></div>
+
+  <!-- MODUS JUDOL -->
+  <div class="section-title" style="margin-top:8px;">Modus Penyebaran Judol</div>
+  <div class="card" id="modusJudolList"></div>
+
+  <!-- DAMPAK BANSOS -->
+  <div class="section-title">Dampak Judol terhadap Penerima Bansos</div>
+  <div class="card card-danger" id="dampakList"></div>
+
+  <!-- KALKULATOR KERUGIAN -->
+  <div class="section-title">Simulasi Kerugian Judol</div>
+  <div class="card">
+    <h3 style="margin-bottom:12px;">🧮 Hitung Estimasi Kerugian</h3>
+    <div class="input-wrap">
+      <label>Deposit per hari (Rp)</label>
+      <input type="number" id="depositPerHari" class="input-field" placeholder="Contoh: 50000" min="0">
+    </div>
+    <div class="input-wrap">
+      <label>Sudah main selama (hari)</label>
+      <input type="number" id="hariMain" class="input-field" placeholder="Contoh: 30" min="1">
+    </div>
+    <button class="btn btn-blue btn-full" onclick="hitungKerugian()">Hitung Kerugian</button>
+    <div id="kerugianResult" style="display:none; margin-top:16px; padding:16px; background:#FEF2F2; border-radius:10px; border:1px solid #FECACA;">
+      <div style="font-size:0.8rem; color:#991B1B; margin-bottom:6px;">Estimasi total uang yang sudah hilang:</div>
+      <div id="kerugianNum" style="font-size:1.8rem; font-weight:800; color:#DC2626;"></div>
+      <div id="kerugianBanding" style="font-size:0.8rem; color:#7F1D1D; margin-top:8px; line-height:1.6;"></div>
+    </div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Beranda</a>
+  <a href="cek-pinjol.html" class="nav-item"><span class="nav-icon">🔍</span>Cek Pinjol</a>
+  <a href="kalkulator.html" class="nav-item"><span class="nav-icon">🧮</span>Kalkulator</a>
+  <a href="self-assessment.html" class="nav-item"><span class="nav-icon">📋</span>Cek Risiko</a>
+  <a href="edukasi.html" class="nav-item"><span class="nav-icon">🎯</span>Kuis</a>
+</nav>
+
+<script>
+document.getElementById('modusJudolList').innerHTML =
+  DATA_JUDOL_MODUS.map(m =>
+    `<div class="list-row"><div class="ico">${m.icon}</div><div class="body"><p>${m.modus}</p></div></div>`
+  ).join('');
+
+document.getElementById('dampakList').innerHTML =
+  DATA_DAMPAK_BANSOS.map(d =>
+    `<div class="list-row">
+      <div class="ico">${d.level === 'high' ? '🔴' : '🟡'}</div>
+      <div class="body"><p>${d.dampak}</p></div>
+    </div>`
+  ).join('');
+
+function cekJudol() {
+  const input = document.getElementById('judolInput').value.trim().toLowerCase();
+  if (!input) { alert('Masukkan nama aplikasi atau kata kunci.'); return; }
+
+  const resultEl = document.getElementById('judolResult');
+  const found = DATA_JUDOL_DOMAIN.some(k => input.includes(k) || k.includes(input));
+
+  resultEl.className = 'result-box show';
+
+  if (found) {
+    resultEl.style.background = '#FEF2F2';
+    resultEl.style.border = '1.5px solid #FECACA';
+    resultEl.innerHTML = `
+      <div class="result-icon">🚨</div>
+      <div class="result-title" style="color:#DC2626;">Terindikasi Judi Online!</div>
+      <div class="result-desc" style="margin-top:8px;">
+        Kata kunci <strong>"${input}"</strong> cocok dengan pola judi online yang diblokir Kominfo.<br><br>
+        Mengakses, memainkan, atau menyebarkan konten ini <strong>melanggar hukum</strong>.
+      </div>
+      <div style="margin-top:14px; padding:12px; background:#FEE2E2; border-radius:8px; font-size:0.82rem; color:#991B1B; line-height:1.6;">
+        ⚖️ Ancaman pidana: <strong>Pasal 303 KUHP</strong> – hingga 10 tahun penjara & denda Rp 25 juta.<br>
+        📊 Rekening Anda bisa <strong>diblacklist PPATK</strong> dan kehilangan hak bansos.
+      </div>
+      <a href="aduan.html" class="btn btn-red btn-full" style="margin-top:12px;">Laporkan ke Pihak Berwenang →</a>
+    `;
+  } else {
+    resultEl.style.background = '#F0FDF4';
+    resultEl.style.border = '1.5px solid #86EFAC';
+    resultEl.innerHTML = `
+      <div class="result-icon">✅</div>
+      <div class="result-title" style="color:#15803D;">Tidak Ditemukan di Database</div>
+      <div class="result-desc" style="margin-top:8px;">
+        "<strong>${input}</strong>" tidak cocok dengan pola judi online yang kami kenal.<br><br>
+        Namun tetap waspada — judi online terus berganti nama dan platform.
+      </div>
+      <div style="margin-top:12px; padding:12px; background:#DCFCE7; border-radius:8px; font-size:0.82rem; color:#166534;">
+        💡 Jika ragu, jangan diakses. Laporkan ke <strong>aduankonten.kominfo.go.id</strong>
+      </div>
+    `;
+  }
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hitungKerugian() {
+  const deposit = parseFloat(document.getElementById('depositPerHari').value) || 0;
+  const hari = parseFloat(document.getElementById('hariMain').value) || 0;
+  if (!deposit || !hari) { alert('Isi kedua kolom terlebih dahulu.'); return; }
+
+  const total = deposit * hari;
+  const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total);
+  const beras = Math.round(total / 12000);
+  const listrik = Math.round(total / 1600);
+
+  document.getElementById('kerugianNum').textContent = fmt;
+  document.getElementById('kerugianBanding').innerHTML =
+    `Uang sebesar ini setara dengan:<br>
+    🌾 <strong>${beras.toLocaleString('id-ID')} kg beras</strong> (@ Rp 12.000/kg)<br>
+    ⚡ <strong>${listrik.toLocaleString('id-ID')} kWh listrik</strong> (@ Rp 1.600/kWh)<br><br>
+    Dan ini baru <em>estimasi deposit</em> — belum termasuk kerugian akibat hutang pinjol untuk modal judol.`;
+  document.getElementById('kerugianResult').style.display = 'block';
+  document.getElementById('kerugianResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+document.getElementById('judolInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') cekJudol();
+});
+</script>
+</body>
+</html>

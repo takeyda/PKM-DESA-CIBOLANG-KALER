@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Kuis & Edukasi – SIDANTI</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="topbar-back">←</a>
+  <div>
+    <div class="topbar-title">🎯 Kuis & Edukasi</div>
+    <div class="topbar-sub">Uji pengetahuan, perkuat perlindungan</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- START -->
+  <div id="startScreen">
+    <div class="card" style="text-align:center; padding:28px 20px; margin-top:4px;">
+      <div style="font-size:3rem; margin-bottom:12px;">🎯</div>
+      <h2 style="margin-bottom:8px;">Kuis Pinjol, Judol & Hoaks</h2>
+      <p style="margin-bottom:16px;">Uji seberapa siap Anda mengenali dan menghindari ancaman digital di sekitar kita.</p>
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:20px;">
+        <span class="badge badge-blue">10 Soal</span>
+        <span class="badge badge-red">Skenario Nyata</span>
+        <span class="badge badge-green">Ada Penjelasan</span>
+      </div>
+      <button class="btn btn-blue btn-full btn-lg" onclick="mulaiKuis()">▶ Mulai Kuis</button>
+    </div>
+
+    <div class="section-title" style="margin-top:8px;">Tips Cepat</div>
+    <div class="card">
+      <div class="list-row"><div class="ico">🛑</div><div class="body"><h4>STOP sebelum forward</h4><p>Tahan diri dulu. Pesan sensasional yang minta "disebarkan segera" hampir selalu hoaks.</p></div></div>
+      <div class="list-row"><div class="ico">🔐</div><div class="body"><h4>OTP = Kunci Rekening</h4><p>Tidak ada instansi resmi yang meminta kode OTP. Siapapun yang meminta OTP adalah penipu.</p></div></div>
+      <div class="list-row"><div class="ico">📊</div><div class="body"><h4>Hitung dulu baru pinjam</h4><p>Bunga 1%/hari = 365%/tahun. Gunakan kalkulator di aplikasi ini sebelum memutuskan pinjam.</p></div></div>
+      <div class="list-row"><div class="ico">🎰</div><div class="body"><h4>Judol selalu menang bagi bandar</h4><p>Sistem dirancang agar pemain pasti rugi dalam jangka panjang. Tidak ada yang benar-benar menang.</p></div></div>
+    </div>
+  </div>
+
+  <!-- KUIS -->
+  <div id="quizArea" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <span style="font-size:0.8rem; font-weight:700; color:var(--blue);" id="qNum"></span>
+      <span style="font-size:0.8rem; color:var(--muted);" id="qSkor">Benar: 0</span>
+    </div>
+    <div class="progress-bg" style="margin-bottom:16px;"><div class="progress-fill" id="qBar" style="width:0%;background:var(--blue);"></div></div>
+    <div class="card">
+      <div id="qContext" class="alert alert-blue" style="display:none;margin-bottom:14px;font-size:0.82rem;"></div>
+      <div id="qText" style="font-size:0.95rem;font-weight:700;margin-bottom:16px;line-height:1.5;"></div>
+      <div id="qOpts"></div>
+      <div id="qFeedback" style="display:none; margin-top:12px; padding:12px 14px; border-radius:8px; font-size:0.85rem; line-height:1.5;"></div>
+      <button class="btn btn-blue btn-full" id="btnNext" onclick="nextQ()" style="display:none; margin-top:14px;"></button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultArea" style="display:none;">
+    <div class="card" style="text-align:center; padding:28px;">
+      <div class="score-circle" id="scoreCircle">
+        <div class="num" id="scoreNum"></div>
+        <div class="lbl">dari 100</div>
+      </div>
+      <h2 id="scoreTitle" style="margin-bottom:8px;"></h2>
+      <p id="scoreMsg" style="margin-bottom:20px;"></p>
+      <div class="progress-bg" style="margin-bottom:16px;">
+        <div class="progress-fill" id="scoreBar" style="width:0%"></div>
+      </div>
+      <div id="scoreDetail" style="font-size:0.82rem; color:var(--muted); margin-bottom:20px;"></div>
+      <button class="btn btn-outline btn-full" onclick="ulangKuis()" style="margin-bottom:8px;">🔄 Ulangi Kuis</button>
+      <a href="self-assessment.html" class="btn btn-blue btn-full">Cek Risiko Lebih Lengkap →</a>
+    </div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Beranda</a>
+  <a href="cek-pinjol.html" class="nav-item"><span class="nav-icon">🔍</span>Cek Pinjol</a>
+  <a href="kalkulator.html" class="nav-item"><span class="nav-icon">🧮</span>Kalkulator</a>
+  <a href="self-assessment.html" class="nav-item"><span class="nav-icon">📋</span>Cek Risiko</a>
+  <a href="edukasi.html" class="nav-item active"><span class="nav-icon">🎯</span>Kuis</a>
+</nav>
+
+<script>
+const kuis = [
+  { ctx:'Seorang kenalan menghubungi Anda via WhatsApp dan menawarkan pinjaman Rp 2 juta, cair dalam 5 menit, tanpa syarat, bunga "cuma" 1% per hari.', q:'Apa yang sebaiknya dilakukan?', opts:['Ambil saja karena butuh mendesak','Tolak — bunga 1%/hari = 365%/tahun, jauh di atas batas OJK','Tanya dulu apakah terdaftar OJK lewat chat','Pinjam tapi langsung lunas besok saja'], ans:1, exp:'✅ Bunga 1%/hari setara 365%/tahun — jauh melampaui batas OJK (maksimal 0,3%/hari). Ini ciri khas pinjol ilegal. Tolak dan cari alternatif pinjaman ke koperasi atau keluarga.' },
+  { ctx:null, q:'Rekening penerima bansos Anda bisa diblacklist PPATK jika...', opts:['Saldo rekening terlalu kecil','Terdapat transaksi yang terindikasi perjudian atau pinjol ilegal','Tidak pernah digunakan selama 3 bulan','Berganti nomor HP'], ans:1, exp:'✅ PPATK (Pusat Pelaporan dan Analisis Transaksi Keuangan) memantau transaksi mencurigakan. Rekening yang digunakan untuk judol/pinjol ilegal bisa diblacklist, sehingga tidak bisa menerima transfer bansos.' },
+  { ctx:'Anda menerima notifikasi: "SELAMAT! Nomor Anda menang undian smartphone Rp 10 juta! Transfer biaya admin Rp 200.000 untuk klaim hadiah."', q:'Ini adalah...', opts:['Hadiah nyata, segera transfer','Penipuan — hadiah asli tidak pernah minta biaya di muka','Mungkin asli, tanya dulu ke bank','Kirim setengahnya dulu untuk tes'], ans:1, exp:'✅ Ini modus "advance fee fraud" (penipuan biaya di muka). Hadiah resmi TIDAK PERNAH meminta Anda transfer uang terlebih dahulu. Abaikan dan blokir.' },
+  { ctx:null, q:'Bermain judi online di Indonesia dapat dikenai sanksi hukum berdasarkan...', opts:['UU ITE saja','Tidak ada sanksi khusus','KUHP Pasal 303 — ancaman hingga 10 tahun penjara & denda Rp 25 juta','Hanya ditegur RT/RW setempat'], ans:2, exp:'✅ KUHP Pasal 303 mengatur tentang perjudian dengan ancaman penjara hingga 10 tahun dan denda hingga Rp 25 juta. Ini berlaku termasuk untuk judi online.' },
+  { ctx:null, q:'Ciri fintech pinjaman yang BERIZIN OJK adalah...', opts:['Proses cair sangat cepat tanpa verifikasi','Meminta akses kontak dan galeri HP','Ada di daftar OJK, transparan soal bunga, penagihan sesuai aturan','Bisa pinjam tanpa KTP atau data apapun'], ans:2, exp:'✅ Fintech berizin OJK wajib transparan soal bunga dan biaya, tidak boleh mengakses kontak/galeri tanpa izin, dan penagihan harus sesuai kode etik AFPI. Cek di ojk.go.id atau telepon 157.' },
+  { ctx:'Teman Anda bercerita mendapat "penghasilan tambahan" Rp 500.000/hari dari bermain slot online dan mengajak Anda bergabung.', q:'Respons yang paling bijak adalah...', opts:['Ikut mencoba karena hasilnya nyata','Minta diajarkan strateginya','Tolak dengan tegas — sistem slot dirancang agar pemain rugi, cerita "untung" sering direkayasa untuk menarik korban baru','Coba dulu pakai modal kecil'], ans:2, exp:'✅ Sistem slot online dirancang dengan "return to player" di bawah 100%, artinya bandar selalu untung dalam jangka panjang. Cerita sukses sering digunakan sebagai umpan untuk menarik korban baru.' },
+  { ctx:null, q:'Jika seseorang mengaku petugas bank dan meminta kode OTP Anda untuk "keamanan akun", Anda harus...', opts:['Berikan karena dia petugas resmi','Berikan sebagian kode saja','Tutup telepon — bank tidak pernah meminta OTP melalui telepon','Tanya nama dan nomor pegawainya baru berikan'], ans:2, exp:'✅ Kode OTP bersifat rahasia dan bank TIDAK PERNAH meminta OTP melalui telepon atau chat. Ini modus social engineering yang sangat umum. Segera tutup telepon dan hubungi bank langsung.' },
+  { ctx:null, q:'Cara paling aman untuk meminjam uang saat kondisi mendesak adalah...', opts:['Pinjol online yang iklannya sering muncul di medsos','Grup arisan online di Facebook','Koperasi desa, BRI, atau BPD setempat yang terdaftar resmi','Rentenir yang bunganya "lebih rendah" dari pinjol'], ans:2, exp:'✅ Koperasi desa, BRI (khususnya produk KUR), dan BPD adalah pilihan paling aman dengan bunga terkendali dan diawasi pemerintah. Meski prosesnya lebih lambat, Anda terlindungi secara hukum.' },
+  { ctx:'Anda mendapat pesan di grup RT: "INFO PENTING! Pemerintah bagi-bagi bantuan Rp 3 juta untuk semua warga, daftar di link ini sebelum besok!"', q:'Langkah pertama yang dilakukan adalah...', opts:['Langsung klik link dan daftar','Sebarkan ke grup lain agar semua tahu','Verifikasi ke perangkat desa/kelurahan langsung sebelum klik apapun','Tanya tetangga apakah sudah daftar'], ans:2, exp:'✅ Informasi bantuan resmi selalu melalui kanal resmi pemerintah (kelurahan, Kemensos). Klik link dari pesan tidak dikenal sangat berisiko phising — pencurian data. Selalu verifikasi langsung ke perangkat desa.' },
+  { ctx:null, q:'Apa yang dimaksud dengan "blacklist PPATK" pada rekening penerima bansos?', opts:['Rekening dikunci karena saldo nol','Rekening terdeteksi transaksi mencurigakan sehingga dibekukan dan tidak bisa menerima bantuan sosial','Rekening salah input data nama','Rekening belum diverifikasi e-KTP'], ans:1, exp:'✅ PPATK memantau aliran uang untuk mencegah pencucian uang dan transaksi ilegal. Rekening yang terdeteksi digunakan untuk judol atau pinjol ilegal dapat dibekukan, sehingga pemiliknya kehilangan hak penerimaan bansos.' }
+];
+
+let cur = 0, skor = 0, terjawab = false;
+
+function mulaiKuis() {
+  cur = 0; skor = 0;
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  renderSoal();
+}
+
+function renderSoal() {
+  terjawab = false;
+  const d = kuis[cur];
+  document.getElementById('qNum').textContent = `Soal ${cur+1} dari ${kuis.length}`;
+  document.getElementById('qSkor').textContent = `Benar: ${skor}`;
+  document.getElementById('qBar').style.width = `${(cur/kuis.length)*100}%`;
+  const ctxEl = document.getElementById('qContext');
+  if (d.ctx) { ctxEl.innerHTML = `💬 <em>${d.ctx}</em>`; ctxEl.style.display = 'flex'; }
+  else ctxEl.style.display = 'none';
+  document.getElementById('qText').textContent = d.q;
+  const labels = ['A','B','C','D'];
+  document.getElementById('qOpts').innerHTML = d.opts.map((o,i) =>
+    `<div class="quiz-option" id="o${i}" onclick="jawab(${i})">
+      <div class="opt-key">${labels[i]}</div>
+      <div>${o}</div>
+    </div>`).join('');
+  document.getElementById('qFeedback').style.display = 'none';
+  document.getElementById('btnNext').style.display = 'none';
+}
+
+function jawab(idx) {
+  if (terjawab) return;
+  terjawab = true;
+  const d = kuis[cur];
+  const benar = idx === d.ans;
+  if (benar) skor++;
+  document.querySelectorAll('.quiz-option').forEach((el,i) => {
+    el.classList.add('locked');
+    if (i === d.ans) el.classList.add('correct');
+    if (i === idx && !benar) el.classList.add('wrong');
+  });
+  document.getElementById('qSkor').textContent = `Benar: ${skor}`;
+  const fb = document.getElementById('qFeedback');
+  fb.style.display = 'block';
+  fb.style.background = benar ? 'var(--green-light)' : 'var(--red-light)';
+  fb.style.border = benar ? '1px solid #86EFAC' : '1px solid #FECACA';
+  fb.style.color = benar ? '#166534' : '#991B1B';
+  fb.textContent = d.exp;
+  const btn = document.getElementById('btnNext');
+  btn.style.display = 'block';
+  btn.textContent = cur < kuis.length-1 ? 'Soal Berikutnya →' : 'Lihat Hasil 🏆';
+}
+
+function nextQ() {
+  cur++;
+  if (cur >= kuis.length) tampilHasil();
+  else renderSoal();
+}
+
+function tampilHasil() {
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('resultArea').style.display = 'block';
+  const pct = Math.round((skor/kuis.length)*100);
+  const circle = document.getElementById('scoreCircle');
+  circle.className = 'score-circle' + (pct>=80?' high':pct<50?' low':'');
+  document.getElementById('scoreNum').textContent = pct;
+  const barColor = pct>=80?'#15803D':pct<50?'#DC2626':'#D97706';
+  setTimeout(() => { document.getElementById('scoreBar').style.width=pct+'%'; document.getElementById('scoreBar').style.background=barColor; }, 200);
+  let title, msg;
+  if (pct>=80) { title='🎉 Luar Biasa!'; msg='Anda sudah sangat paham tentang bahaya pinjol, judol, dan hoaks. Bantu edukasi warga sekitar Anda!'; }
+  else if (pct>=50) { title='👍 Cukup Baik'; msg='Pemahaman Anda sudah lumayan. Pelajari lagi bagian yang masih perlu diperkuat.'; }
+  else { title='📚 Perlu Belajar Lagi'; msg='Jangan khawatir! Ikuti semua materi di aplikasi ini untuk meningkatkan pemahaman Anda.'; }
+  document.getElementById('scoreTitle').textContent = title;
+  document.getElementById('scoreMsg').textContent = msg;
+  document.getElementById('scoreDetail').textContent = `${skor} benar dari ${kuis.length} soal`;
+  document.getElementById('resultArea').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function ulangKuis() {
+  cur = 0; skor = 0;
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  renderSoal();
+}
+</script>
+</body>
+</html>

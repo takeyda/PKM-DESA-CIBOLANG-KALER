@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Cek Risiko Digital – SIDANTI</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .q-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:14px; }
+  .q-num { font-size:0.72rem; font-weight:700; color:var(--blue); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+  .q-text { font-size:0.95rem; font-weight:700; margin-bottom:14px; line-height:1.45; }
+  .ans-opts { display:flex; flex-direction:column; gap:8px; }
+  .ans-opt { display:flex; align-items:center; gap:12px; padding:11px 14px; border:2px solid var(--border); border-radius:8px; cursor:pointer; font-size:0.88rem; transition:all 0.15s; }
+  .ans-opt:hover { border-color:var(--blue); background:var(--blue-light); }
+  .ans-opt input[type=radio] { accent-color:var(--blue); width:16px; height:16px; flex-shrink:0; }
+  .ans-opt.selected { border-color:var(--blue); background:var(--blue-light); }
+  .risk-gauge { position:relative; height:16px; background:linear-gradient(to right,#15803D,#FCD34D,#DC2626); border-radius:8px; margin:14px 0 8px; }
+  .risk-needle { position:absolute; top:-4px; width:24px; height:24px; border-radius:50%; background:#fff; border:3px solid var(--text); transform:translateX(-50%); transition:left 1s cubic-bezier(.4,0,.2,1); box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .risk-labels { display:flex; justify-content:space-between; font-size:0.68rem; color:var(--muted); font-weight:600; }
+  .rec-item { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+  .rec-item:last-child { border-bottom:none; }
+  .progress-steps { display:flex; gap:4px; margin-bottom:20px; }
+  .step-dot { height:4px; flex:1; border-radius:2px; background:var(--border); transition:background 0.3s; }
+  .step-dot.done { background:var(--blue); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="topbar-back">←</a>
+  <div>
+    <div class="topbar-title">📋 Cek Risiko Digital Saya</div>
+    <div class="topbar-sub">Self-assessment 10 pertanyaan</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <div class="alert alert-blue" style="margin-top:4px;">
+      <span>🔒</span>
+      <span>Jawaban Anda <strong>tidak disimpan</strong> dan bersifat rahasia. Hanya untuk keperluan evaluasi mandiri.</span>
+    </div>
+    <div class="card" style="text-align:center; padding:28px 20px;">
+      <div style="font-size:3rem; margin-bottom:12px;">📋</div>
+      <h2 style="margin-bottom:8px;">Seberapa Aman Digital Anda?</h2>
+      <p style="margin-bottom:20px;">Jawab 10 pertanyaan singkat untuk mengetahui tingkat risiko Anda terhadap pinjol ilegal, judol, dan penipuan digital.</p>
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:20px;">
+        <span class="badge badge-blue">10 Pertanyaan</span>
+        <span class="badge badge-amber">~3 Menit</span>
+        <span class="badge badge-green">Langsung Ada Rekomendasi</span>
+      </div>
+      <button class="btn btn-blue btn-full btn-lg" onclick="mulaiAssessment()">Mulai Sekarang →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ AREA -->
+  <div id="quizArea" style="display:none;">
+    <div class="progress-steps" id="progressSteps"></div>
+    <div id="questionContainer"></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" id="btnPrev" onclick="prevQ()" style="display:none;">← Kembali</button>
+      <button class="btn btn-blue btn-full" id="btnNext" onclick="nextQ()">Selanjutnya →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultScreen" style="display:none;">
+    <div class="card" style="text-align:center; padding:24px;">
+      <h2 style="margin-bottom:16px;">Hasil Penilaian Risiko Anda</h2>
+      <div class="risk-gauge"><div class="risk-needle" id="riskNeedle" style="left:50%"></div></div>
+      <div class="risk-labels"><span>Aman</span><span>Waspada</span><span>Bahaya</span></div>
+      <div style="margin:20px 0 8px;">
+        <div id="riskScore" style="font-size:2.4rem; font-weight:800; line-height:1;"></div>
+        <div id="riskLevel" style="font-size:1rem; font-weight:700; margin-top:4px;"></div>
+      </div>
+      <p id="riskDesc" style="font-size:0.86rem;"></p>
+    </div>
+
+    <!-- SKOR BREAKDOWN -->
+    <div class="card">
+      <h3 style="margin-bottom:14px;">Rincian per Kategori</h3>
+      <div id="breakdown"></div>
+    </div>
+
+    <!-- REKOMENDASI -->
+    <div class="card" id="rekomendasiCard">
+      <h3 style="margin-bottom:14px;">💡 Rekomendasi untuk Anda</h3>
+      <div id="rekomendasiList"></div>
+    </div>
+
+    <button class="btn btn-outline btn-full" onclick="ulang()" style="margin-bottom:8px;">🔄 Ulangi Assessment</button>
+    <a href="index.html" class="btn btn-blue btn-full">← Kembali ke Beranda</a>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Beranda</a>
+  <a href="cek-pinjol.html" class="nav-item"><span class="nav-icon">🔍</span>Cek Pinjol</a>
+  <a href="kalkulator.html" class="nav-item"><span class="nav-icon">🧮</span>Kalkulator</a>
+  <a href="self-assessment.html" class="nav-item active"><span class="nav-icon">📋</span>Cek Risiko</a>
+  <a href="edukasi.html" class="nav-item"><span class="nav-icon">🎯</span>Kuis</a>
+</nav>
+
+<script>
+const questions = [
+  { kat:'pinjol', q:'Apakah Anda pernah meminjam uang dari aplikasi pinjaman online?', opts:[{t:'Tidak pernah',s:0},{t:'Pernah, dari yang terdaftar OJK',s:1},{t:'Pernah, dari yang tidak jelas legalitasnya',s:3},{t:'Saat ini masih memiliki hutang pinjol',s:4}] },
+  { kat:'pinjol', q:'Jika butuh uang mendesak, apa yang biasanya Anda lakukan?', opts:[{t:'Pinjam ke keluarga/teman atau koperasi',s:0},{t:'Ajukan ke bank atau koperasi resmi',s:0},{t:'Cari pinjol yang mudah cair',s:3},{t:'Jual atau gadai barang',s:1}] },
+  { kat:'judol', q:'Apakah Anda pernah memainkan aplikasi atau situs judi online (slot, togel, poker)?', opts:[{t:'Tidak pernah dan tidak tertarik',s:0},{t:'Pernah coba sekali-dua kali tapi sudah berhenti',s:2},{t:'Masih kadang-kadang main',s:4},{t:'Rutin bermain setiap hari/minggu',s:5}] },
+  { kat:'judol', q:'Apakah ada anggota keluarga atau teman dekat yang aktif bermain judol?', opts:[{t:'Tidak ada',s:0},{t:'Ada tapi saya tidak ikut',s:1},{t:'Ada dan saya kadang ikut',s:3},{t:'Kami sering main bersama',s:5}] },
+  { kat:'hoaks', q:'Seberapa sering Anda meneruskan (forward) pesan atau berita dari WhatsApp/media sosial tanpa mengecek kebenarannya?', opts:[{t:'Tidak pernah, saya selalu cek dulu',s:0},{t:'Jarang, hanya jika yakin',s:1},{t:'Cukup sering jika kontennya menarik',s:3},{t:'Sering, karena ingin info cepat sampai',s:4}] },
+  { kat:'hoaks', q:'Pernahkah Anda atau keluarga mengalami kerugian akibat penipuan online (hadiah palsu, phising, dll)?', opts:[{t:'Tidak pernah',s:0},{t:'Hampir kena tapi berhasil menghindari',s:1},{t:'Pernah, tapi kerugian kecil',s:3},{t:'Pernah dengan kerugian besar',s:5}] },
+  { kat:'keamanan', q:'Apakah Anda menggunakan password yang sama untuk beberapa akun berbeda?', opts:[{t:'Tidak, setiap akun beda password',s:0},{t:'Beberapa akun penting berbeda',s:1},{t:'Sebagian besar sama',s:3},{t:'Semua akun pakai password yang sama',s:4}] },
+  { kat:'keamanan', q:'Apakah Anda pernah memberikan kode OTP atau PIN kepada orang lain (termasuk yang mengaku petugas bank)?', opts:[{t:'Tidak pernah, tahu itu berbahaya',s:0},{t:'Belum pernah tapi tidak tahu itu berbahaya',s:2},{t:'Pernah sekali karena percaya',s:4},{t:'Beberapa kali',s:5}] },
+  { kat:'bansos', q:'Apakah rekening Anda pernah mengalami masalah terkait penerimaan bantuan sosial?', opts:[{t:'Tidak pernah, lancar',s:0},{t:'Pernah ada keterlambatan biasa',s:1},{t:'Pernah diblokir sementara',s:3},{t:'Diblacklist dan tidak bisa terima bansos',s:5}] },
+  { kat:'bansos', q:'Seberapa paham Anda tentang aturan penggunaan rekening penerima bansos?', opts:[{t:'Sangat paham, tahu aturannya',s:0},{t:'Cukup paham secara umum',s:1},{t:'Kurang paham',s:3},{t:'Tidak tahu sama sekali',s:4}] }
+];
+
+const katLabel = { pinjol:'Risiko Pinjol', judol:'Risiko Judol', hoaks:'Risiko Hoaks/Penipuan', keamanan:'Keamanan Akun', bansos:'Keamanan Bansos' };
+let current = 0, answers = new Array(questions.length).fill(null);
+
+function mulaiAssessment() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  buildProgress();
+  renderQ();
+}
+
+function buildProgress() {
+  const steps = document.getElementById('progressSteps');
+  steps.innerHTML = questions.map((_,i) => `<div class="step-dot" id="step-${i}"></div>`).join('');
+}
+
+function renderQ() {
+  const q = questions[current];
+  document.querySelectorAll('.step-dot').forEach((d,i) => d.classList.toggle('done', i <= current));
+  document.getElementById('btnPrev').style.display = current > 0 ? 'block' : 'none';
+  document.getElementById('btnNext').textContent = current < questions.length-1 ? 'Selanjutnya →' : 'Lihat Hasil 🏆';
+
+  document.getElementById('questionContainer').innerHTML = `
+    <div class="q-card">
+      <div class="q-num">Pertanyaan ${current+1} dari ${questions.length} · ${katLabel[q.kat]}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="ans-opts">
+        ${q.opts.map((o,i) => `
+          <label class="ans-opt ${answers[current]===i?'selected':''}" id="opt-${i}" onclick="pilih(${i})">
+            <input type="radio" name="q${current}" ${answers[current]===i?'checked':''} readonly>
+            <span>${o.t}</span>
+          </label>`).join('')}
+      </div>
+    </div>`;
+}
+
+function pilih(idx) {
+  answers[current] = idx;
+  document.querySelectorAll('.ans-opt').forEach((el,i) => el.classList.toggle('selected', i===idx));
+}
+
+function nextQ() {
+  if (answers[current] === null) { alert('Pilih salah satu jawaban terlebih dahulu.'); return; }
+  if (current < questions.length-1) { current++; renderQ(); }
+  else tampilkanHasil();
+}
+
+function prevQ() { if (current > 0) { current--; renderQ(); } }
+
+function tampilkanHasil() {
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'block';
+
+  const totalSkor = answers.reduce((sum, a, i) => sum + questions[i].opts[a].s, 0);
+  const maxSkor = questions.reduce((sum, q) => sum + Math.max(...q.opts.map(o=>o.s)), 0);
+  const pct = Math.round((totalSkor / maxSkor) * 100);
+
+  // Gauge needle
+  setTimeout(() => {
+    document.getElementById('riskNeedle').style.left = Math.min(95, Math.max(5, pct)) + '%';
+  }, 300);
+
+  let level, color, desc;
+  if (pct <= 25) {
+    level = '🟢 Risiko Rendah – Anda Sudah Waspada';
+    color = '#15803D';
+    desc = 'Perilaku digital Anda sudah cukup aman. Pertahankan dan bagikan pengetahuan ini ke keluarga & tetangga.';
+  } else if (pct <= 55) {
+    level = '🟡 Risiko Sedang – Perlu Lebih Waspada';
+    color = '#B45309';
+    desc = 'Ada beberapa area yang perlu diperbaiki. Perhatikan rekomendasi di bawah untuk mengurangi risiko.';
+  } else {
+    level = '🔴 Risiko Tinggi – Segera Ambil Tindakan';
+    color = '#DC2626';
+    desc = 'Anda atau keluarga berisiko tinggi terjerat pinjol/judol atau penipuan digital. Segera ikuti rekomendasi di bawah.';
+  }
+
+  document.getElementById('riskScore').innerHTML = `<span style="color:${color}">${pct}%</span>`;
+  document.getElementById('riskLevel').innerHTML = `<span style="color:${color}">${level}</span>`;
+  document.getElementById('riskDesc').textContent = desc;
+
+  // Breakdown per kategori
+  const kats = ['pinjol','judol','hoaks','keamanan','bansos'];
+  let breakdownHTML = '';
+  kats.forEach(k => {
+    const qList = questions.map((q,i) => ({q,i})).filter(({q}) => q.kat === k);
+    const skor = qList.reduce((sum,{q,i}) => sum + q.opts[answers[i]].s, 0);
+    const maxK = qList.reduce((sum,{q}) => sum + Math.max(...q.opts.map(o=>o.s)), 0);
+    const pctK = Math.round((skor/maxK)*100);
+    const barColor = pctK<=25?'#15803D':pctK<=55?'#D97706':'#DC2626';
+    breakdownHTML += `<div class="chart-row">
+      <div class="chart-label"><span>${katLabel[k]}</span><span style="color:${barColor};font-weight:700;">${pctK}%</span></div>
+      <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:0%;background:${barColor};" data-w="${pctK}"></div></div>
+    </div>`;
+  });
+  document.getElementById('breakdown').innerHTML = breakdownHTML;
+  setTimeout(() => {
+    document.querySelectorAll('.chart-bar-fill[data-w]').forEach(el => {
+      el.style.width = el.getAttribute('data-w') + '%';
+    });
+  }, 300);
+
+  // Rekomendasi
+  const recs = [];
+  if (pct > 25) {
+    recs.push({i:'🔍',t:'Cek legalitas pinjol',d:'Sebelum meminjam, selalu cek di OJK (157) atau gunakan fitur Cek Pinjol di aplikasi ini.'});
+    recs.push({i:'🚫',t:'Hindari judi online',d:'Tutup semua aplikasi/situs judol. Laporkan ke Kominfo (aduankonten.kominfo.go.id) jika ada yang mengajak.'});
+    recs.push({i:'🔑',t:'Ganti password penting',d:'Pastikan password akun bank, e-wallet, dan media sosial Anda kuat dan berbeda-beda.'});
+    recs.push({i:'📞',t:'Konsultasi ke perangkat desa',d:'Jika rekening Anda sudah bermasalah, segera konsultasi ke perangkat desa untuk pendampingan.'});
+  }
+  if (pct <= 25) {
+    recs.push({i:'🤝',t:'Bantu edukasi orang sekitar',d:'Anda sudah paham. Bantu keluarga dan tetangga yang mungkin belum tahu tentang bahaya pinjol dan judol.'});
+    recs.push({i:'📖',t:'Tetap update pengetahuan',d:'Modus penipuan terus berkembang. Ikuti informasi terbaru dari Kominfo dan OJK.'});
+  }
+
+  document.getElementById('rekomendasiList').innerHTML = recs.map(r =>
+    `<div class="rec-item"><div style="font-size:1.4rem;flex-shrink:0;">${r.i}</div><div><h4 style="font-size:0.88rem;margin-bottom:3px;">${r.t}</h4><p style="font-size:0.8rem;">${r.d}</p></div></div>`
+  ).join('');
+
+  document.getElementById('resultScreen').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function ulang() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  buildProgress();
+  renderQ();
+}
+</script>
+</body>
+</html>
